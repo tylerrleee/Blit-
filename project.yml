@@ -1,0 +1,50 @@
+name: Blit
+options:
+  bundleIdPrefix: com.blit
+  deploymentTarget:
+    iOS: "17.0"
+  xcodeVersion: "16.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+
+packages:
+  Supabase:
+    url: https://github.com/supabase/supabase-swift.git
+    from: "2.0.0"
+
+targets:
+  Blit:
+    type: application
+    platform: iOS
+    sources:
+      - Blit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.blit.app
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: true
+        INFOPLIST_KEY_UILaunchScreen_Generation: true
+        INFOPLIST_KEY_CFBundleDisplayName: Blit
+        INFOPLIST_KEY_LSApplicationCategoryType: "public.app-category.finance"
+        GENERATE_INFOPLIST_FILE: true
+        INFOPLIST_KEY_NSCameraUsageDescription: "Blit needs camera access to scan receipts"
+        SWIFT_EMIT_LOC_STRINGS: true
+    dependencies:
+      - package: Supabase
+        product: Supabase
+
+  BlitTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - BlitTests
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.blit.app.tests
+        GENERATE_INFOPLIST_FILE: true
+    dependencies:
+      - target: Blit

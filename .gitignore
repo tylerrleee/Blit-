@@ -1,0 +1,28 @@
+## Xcode
+xcuserdata/
+build/
+DerivedData/
+*.xccheckout
+*.xcscmblueprint
+*.moved-aside
+Blit.xcodeproj/
+
+## SPM
+.build/
+.swiftpm/
+
+## Env / secrets
+.env
+*.xcconfig
+!Base.xcconfig
+
+## macOS
+.DS_Store
+
+# Claude
+.claude
+.mcp.json
+my-plugin/
+
+# Working docs
+docs/
