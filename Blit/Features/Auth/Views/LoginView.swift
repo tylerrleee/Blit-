@@ -25,7 +25,7 @@ struct LoginView: View {
                     .foregroundStyle(Color.blitDark)
 
                 // Tagline
-                Text("Lightning fast connections\nfor the modern world.")
+                Text("Skip the calculator and manual bill splitting")
                     .font(.body)
                     .multilineTextAlignment(.center)
                     .foregroundStyle(Color.blitDark.opacity(0.7))

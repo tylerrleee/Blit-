@@ -31,7 +31,15 @@ struct BlitApp: App {
                 state.startListening()
             }
             .onOpenURL { url in
-                supabase.auth.handle(url)
+                print("[AUTH] onOpenURL called with: \(url)")
+                Task {
+                    do {
+                        let session = try await supabase.auth.session(from: url)
+                        print("[AUTH] Session restored from URL: \(session.user.email ?? "no email")")
+                    } catch {
+                        print("[AUTH] Failed to get session from URL: \(error)")
+                    }
+                }
             }
         }
     }
