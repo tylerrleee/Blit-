@@ -2,6 +2,9 @@ import Foundation
 
 struct RegexReceiptParser: ReceiptParser, Sendable {
 
+    // Regex literal is a value type — safe to share across isolation domains.
+    // nonisolated(unsafe) is required because Swift 6 doesn't yet recognize
+    // Regex as Sendable, but the literal contains no mutable state.
     private static nonisolated(unsafe) let pricePattern = /\$?\s*(\d{1,4}\.\d{2})/
     private static let subtotalKeywords: Set<String> = ["subtotal", "sub total", "sub-total"]
     private static let taxKeywords: Set<String> = ["tax", "sales tax", "hst", "gst", "vat"]
@@ -16,7 +19,7 @@ struct RegexReceiptParser: ReceiptParser, Sendable {
         "change", "payment",
     ]
 
-    func parse(textBlocks: [OCRTextBlock]) throws -> ParsedReceipt {
+    func parse(textBlocks: [OCRTextBlock]) async throws -> ParsedReceipt {
         guard !textBlocks.isEmpty else {
             return ParsedReceipt(items: [], subtotal: nil, tax: nil, tip: nil, restaurantName: nil, confidence: 0)
         }

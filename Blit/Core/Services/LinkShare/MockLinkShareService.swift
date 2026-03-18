@@ -1,5 +1,7 @@
 import Foundation
 
+// @unchecked Sendable is safe: no stored properties, no mutable state.
+// All methods construct fresh values and return them.
 final class MockLinkShareService: LinkShareService, @unchecked Sendable {
     func generateLink(for receiptId: UUID) async throws -> ShareLink {
         ShareLink(

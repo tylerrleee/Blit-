@@ -12,7 +12,7 @@ private func block(_ text: String, y: CGFloat, confidence: Float = 0.95) -> OCRT
 // MARK: - Standard Receipt Format
 
 @Test("Parses standard restaurant receipt with items, subtotal, tax, tip")
-func standardReceipt() throws {
+func standardReceipt() async throws {
     let blocks: [OCRTextBlock] = [
         block("The Blue Bistro", y: 0.95),
         block("Truffle Fries $12.00", y: 0.80),
@@ -25,7 +25,7 @@ func standardReceipt() throws {
     ]
 
     let parser = RegexReceiptParser()
-    let result = try parser.parse(textBlocks: blocks)
+    let result = try await parser.parse(textBlocks: blocks)
 
     #expect(result.items.count == 3)
     #expect(result.items[0].name == "Truffle Fries")
@@ -40,7 +40,7 @@ func standardReceipt() throws {
 }
 
 @Test("Extracts restaurant name from first text block")
-func restaurantNameExtraction() throws {
+func restaurantNameExtraction() async throws {
     let blocks: [OCRTextBlock] = [
         block("Pasta Palace", y: 0.95),
         block("Margherita Pizza $18.50", y: 0.80),
@@ -48,7 +48,7 @@ func restaurantNameExtraction() throws {
     ]
 
     let parser = RegexReceiptParser()
-    let result = try parser.parse(textBlocks: blocks)
+    let result = try await parser.parse(textBlocks: blocks)
 
     #expect(result.restaurantName == "Pasta Palace")
 }
@@ -56,7 +56,7 @@ func restaurantNameExtraction() throws {
 // MARK: - Receipt Without Dollar Signs
 
 @Test("Handles prices without dollar sign prefix")
-func pricesWithoutDollarSign() throws {
+func pricesWithoutDollarSign() async throws {
     let blocks: [OCRTextBlock] = [
         block("Cafe Roma", y: 0.95),
         block("Latte 5.50", y: 0.80),
@@ -65,7 +65,7 @@ func pricesWithoutDollarSign() throws {
     ]
 
     let parser = RegexReceiptParser()
-    let result = try parser.parse(textBlocks: blocks)
+    let result = try await parser.parse(textBlocks: blocks)
 
     #expect(result.items.count == 2)
     #expect(result.items[0].price == Decimal(string: "5.50")!)
@@ -75,7 +75,7 @@ func pricesWithoutDollarSign() throws {
 // MARK: - Receipt With No Tax/Tip
 
 @Test("Handles receipt with no tax or tip lines")
-func noTaxOrTip() throws {
+func noTaxOrTip() async throws {
     let blocks: [OCRTextBlock] = [
         block("Food Truck", y: 0.95),
         block("Tacos $8.00", y: 0.80),
@@ -83,7 +83,7 @@ func noTaxOrTip() throws {
     ]
 
     let parser = RegexReceiptParser()
-    let result = try parser.parse(textBlocks: blocks)
+    let result = try await parser.parse(textBlocks: blocks)
 
     #expect(result.items.count == 2)
     #expect(result.tax == nil)
@@ -93,7 +93,7 @@ func noTaxOrTip() throws {
 // MARK: - Tip as Percentage
 
 @Test("Handles tip line with percentage indicator")
-func tipAsPercentage() throws {
+func tipAsPercentage() async throws {
     let blocks: [OCRTextBlock] = [
         block("Restaurant", y: 0.95),
         block("Dinner $40.00", y: 0.80),
@@ -103,7 +103,7 @@ func tipAsPercentage() throws {
     ]
 
     let parser = RegexReceiptParser()
-    let result = try parser.parse(textBlocks: blocks)
+    let result = try await parser.parse(textBlocks: blocks)
 
     #expect(result.tip == Decimal(string: "8.00")!)
 }
@@ -111,7 +111,7 @@ func tipAsPercentage() throws {
 // MARK: - Filters Non-Item Lines
 
 @Test("Filters out common non-item text: payment, thank you, address")
-func filtersNonItemLines() throws {
+func filtersNonItemLines() async throws {
     let blocks: [OCRTextBlock] = [
         block("Restaurant Name", y: 0.95),
         block("123 Main St, Anytown", y: 0.92),
@@ -123,7 +123,7 @@ func filtersNonItemLines() throws {
     ]
 
     let parser = RegexReceiptParser()
-    let result = try parser.parse(textBlocks: blocks)
+    let result = try await parser.parse(textBlocks: blocks)
 
     #expect(result.items.count == 1)
     #expect(result.items[0].name == "Chicken Wings")
@@ -132,7 +132,7 @@ func filtersNonItemLines() throws {
 // MARK: - Y-Position Sorting
 
 @Test("Blocks are sorted by Y position for correct reading order")
-func yPositionSorting() throws {
+func yPositionSorting() async throws {
     // Provide blocks in random order — parser should sort by Y descending (top-first)
     let blocks: [OCRTextBlock] = [
         block("Tax $2.00", y: 0.35),
@@ -143,7 +143,7 @@ func yPositionSorting() throws {
     ]
 
     let parser = RegexReceiptParser()
-    let result = try parser.parse(textBlocks: blocks)
+    let result = try await parser.parse(textBlocks: blocks)
 
     // Should find Soup before Salad based on Y-sort (descending = top first)
     #expect(result.items.count == 2)
@@ -154,9 +154,9 @@ func yPositionSorting() throws {
 // MARK: - Edge Cases
 
 @Test("Empty input returns empty parsed receipt")
-func emptyInput() throws {
+func emptyInput() async throws {
     let parser = RegexReceiptParser()
-    let result = try parser.parse(textBlocks: [])
+    let result = try await parser.parse(textBlocks: [])
 
     #expect(result.items.isEmpty)
     #expect(result.subtotal == nil)
@@ -166,21 +166,21 @@ func emptyInput() throws {
 }
 
 @Test("Low-confidence blocks are included but flagged")
-func lowConfidenceBlocks() throws {
+func lowConfidenceBlocks() async throws {
     let blocks: [OCRTextBlock] = [
         block("Restaurant", y: 0.95, confidence: 0.30),
         block("Burger $15.00", y: 0.80, confidence: 0.40),
     ]
 
     let parser = RegexReceiptParser()
-    let result = try parser.parse(textBlocks: blocks)
+    let result = try await parser.parse(textBlocks: blocks)
 
     #expect(result.items.count == 1)
     #expect(result.confidence < 0.5)
 }
 
 @Test("Handles 'Gratuity' as tip keyword")
-func gratuityAsTip() throws {
+func gratuityAsTip() async throws {
     let blocks: [OCRTextBlock] = [
         block("Fine Dining", y: 0.95),
         block("Lobster $65.00", y: 0.80),
@@ -190,7 +190,7 @@ func gratuityAsTip() throws {
     ]
 
     let parser = RegexReceiptParser()
-    let result = try parser.parse(textBlocks: blocks)
+    let result = try await parser.parse(textBlocks: blocks)
 
     #expect(result.tip == Decimal(string: "13.00")!)
 }

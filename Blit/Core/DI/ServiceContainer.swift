@@ -1,6 +1,8 @@
 import Foundation
 import Observation
 
+// @unchecked Sendable is safe: all stored properties are `let` constants
+// conforming to `Sendable` protocol requirements. No mutable state.
 @Observable final class ServiceContainer: @unchecked Sendable {
     let auth: any AuthService
     let database: any DatabaseService

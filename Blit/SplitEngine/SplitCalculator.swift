@@ -114,13 +114,23 @@ struct SplitCalculator: Sendable {
         let remainder = grandTotal - (perPerson * count)
 
         return participants.enumerated().map { index, p in
+            let isFirst = index == 0
+            let equalSubtotal = roundCurrency(subtotal / count)
+            let equalTax = roundCurrency(tax / count)
+            let equalTip = roundCurrency(tip / count)
+
+            let subtotalRemainder = isFirst ? subtotal - equalSubtotal * count : 0
+            let taxRemainder = isFirst ? tax - equalTax * count : 0
+            let tipRemainder = isFirst ? tip - equalTip * count : 0
+
             var total = perPerson
-            if index == 0 { total += remainder }
+            if isFirst { total += remainder }
+
             return ParticipantShare(
                 participantId: p.id,
-                subtotal: roundCurrency(subtotal / count) + (index == 0 ? subtotal - roundCurrency(subtotal / count) * count : 0),
-                taxShare: roundCurrency(tax / count) + (index == 0 ? tax - roundCurrency(tax / count) * count : 0),
-                tipShare: roundCurrency(tip / count) + (index == 0 ? tip - roundCurrency(tip / count) * count : 0),
+                subtotal: equalSubtotal + subtotalRemainder,
+                taxShare: equalTax + taxRemainder,
+                tipShare: equalTip + tipRemainder,
                 total: total,
                 items: lineItems
             )

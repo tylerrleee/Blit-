@@ -1,8 +1,8 @@
 import Foundation
 
-enum AppError: LocalizedError, Sendable {
+enum AppError: LocalizedError, Sendable, Equatable {
     case authFailed(message: String)
-    case networkError(underlying: Error)
+    case networkError(message: String)
     case ocrFailed(message: String)
     case parsingFailed(message: String)
     case databaseError(message: String)
@@ -14,8 +14,8 @@ enum AppError: LocalizedError, Sendable {
         switch self {
         case .authFailed(let message):
             return "Authentication failed: \(message)"
-        case .networkError(let error):
-            return "Network error: \(error.localizedDescription)"
+        case .networkError(let message):
+            return "Network error: \(message)"
         case .ocrFailed(let message):
             return "Receipt scan failed: \(message)"
         case .parsingFailed(let message):
@@ -29,11 +29,5 @@ enum AppError: LocalizedError, Sendable {
         case .unauthorized:
             return "You don't have permission to perform this action"
         }
-    }
-}
-
-extension AppError: Equatable {
-    static func == (lhs: AppError, rhs: AppError) -> Bool {
-        lhs.errorDescription == rhs.errorDescription
     }
 }

@@ -26,13 +26,22 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.blit.app
-        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: true
-        INFOPLIST_KEY_UILaunchScreen_Generation: true
-        INFOPLIST_KEY_CFBundleDisplayName: Blit
-        INFOPLIST_KEY_LSApplicationCategoryType: "public.app-category.finance"
-        GENERATE_INFOPLIST_FILE: true
-        INFOPLIST_KEY_NSCameraUsageDescription: "Blit needs camera access to scan receipts"
         SWIFT_EMIT_LOC_STRINGS: true
+    info:
+      path: Blit/Resources/Info.plist
+      properties:
+        CFBundleURLTypes:
+          - CFBundleURLSchemes:
+              - blit
+        SUPABASE_URL: $(SUPABASE_URL)
+        SUPABASE_ANON_KEY: $(SUPABASE_ANON_KEY)
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+          UISceneConfigurations: {}
+        UILaunchScreen: {}
+        NSCameraUsageDescription: "Blit needs camera access to scan receipts"
+        CFBundleDisplayName: Blit
+        LSApplicationCategoryType: "public.app-category.finance"
     dependencies:
       - package: Supabase
         product: Supabase

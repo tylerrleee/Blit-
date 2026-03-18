@@ -1,6 +1,7 @@
 import Foundation
 
-final class MockAuthService: AuthService, @unchecked Sendable {
+@MainActor
+final class MockAuthService: AuthService {
     var shouldSucceed = true
     var mockUser = User(
         id: UUID(uuidString: "00000000-0000-0000-0000-000000000001")!,
